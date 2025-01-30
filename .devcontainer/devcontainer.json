@@ -1,0 +1,43 @@
+{
+    "name": "Node.js Development Environment",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "context": ".."
+    },
+    "remoteUser": "node",
+    "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
+    "workspaceFolder": "/workspace",
+    
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "dbaeumer.vscode-eslint",
+                "esbenp.prettier-vscode",
+                "ms-vscode.vscode-typescript-tslint-plugin"
+            ],
+            "settings": {
+                "terminal.integrated.defaultProfile.linux": "bash",
+                "terminal.integrated.profiles.linux": {
+                    "bash": {
+                        "path": "/bin/bash"
+                    }
+                }
+            }
+        }
+    },
+    
+    "features": {
+        "ghcr.io/devcontainers/features/node:1": {},
+        "ghcr.io/devcontainers/features/git:1": {}
+    },
+    
+    // Remove the problematic mounts that caused the error
+    "initializeCommand": "mkdir -p ~/.gitconfig ~/.ssh",
+    
+    // Commands to run after container is created
+    "postCreateCommand": "npm install",
+    
+    "remoteEnv": {
+        "PATH": "${containerEnv:PATH}:/workspace/node_modules/.bin"
+    }
+}
