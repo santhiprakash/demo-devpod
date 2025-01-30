@@ -4,22 +4,36 @@
         "dockerfile": "Dockerfile",
         "context": ".."
     },
-    "remoteUser": "node",
+    "remoteUser": "devpod",
     "workspaceFolder": "/workspace",
+    
+    // Add proper mounts
+    "mounts": [
+        "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+    ],
+    
     "customizations": {
         "vscode": {
             "extensions": [
                 "dbaeumer.vscode-eslint",
                 "esbenp.prettier-vscode"
             ]
-        },
-        "devpod": {
-            "prebuildRepository": "https://github.com/santhiprakash/devpod.git"
         }
     },
-    "features": {
-        "ghcr.io/devcontainers/features/git:1": {},
-        "ghcr.io/devcontainers/features/node:1": {}
+    
+    // Add initialization steps
+    "initializeCommand": {
+        "setup-permissions": "chmod +x .devcontainer/setup-azure.sh && ./.devcontainer/setup-azure.sh"
     },
+    
+    "features": {
+        "ghcr.io/devcontainers/features/docker-in-docker:2": {
+            "version": "latest",
+            "moby": true
+        },
+        "ghcr.io/devcontainers/features/git:1": {}
+    },
+    
+    // Ensure Git is properly configured
     "postCreateCommand": "git config --global init.defaultBranch main && git config --global core.autocrlf input"
 }
