@@ -1,0 +1,9 @@
+{
+    "workspace": {
+        "name": "devpod",
+        "git": {
+            "username": "DevPod User",
+            "email": "devpod@example.com"
+        }
+    }
+}
