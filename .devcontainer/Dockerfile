@@ -1,37 +1,43 @@
-FROM mcr.microsoft.com/devcontainers/javascript-node:latest
-
-# Configure non-root user
-ARG USERNAME=node
-ARG USER_UID=1000
-ARG USER_GID=$USER_UID
+FROM mcr.microsoft.com/devcontainers/base:ubuntu
 
 # Install essential tools
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends \
         curl \
         git \
-        ssh \
         sudo \
+        docker.io \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
 
-# Ensure proper Git configuration directory structure
-RUN mkdir -p /home/node/.config \
-    && touch /home/node/.gitconfig \
-    && chown -R node:node /home/node/.config \
-    && chown node:node /home/node/.gitconfig
+# Create devpod user and set up permissions
+ARG USERNAME=devpod
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
 
-# Create and set up workspace directory
+# Create the user
+RUN groupadd --gid $USER_GID $USERNAME \
+    && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
+    && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
+    && chmod 0440 /etc/sudoers.d/$USERNAME
+
+# Create workspace directory
+RUN mkdir -p /workspace \
+    && chown -R $USERNAME:$USERNAME /workspace
+
+# Create necessary dot directories
+RUN mkdir -p /home/$USERNAME/.docker \
+    && mkdir -p /home/$USERNAME/.gitconfig.d \
+    && mkdir -p /home/$USERNAME/.ssh \
+    && chown -R $USERNAME:$USERNAME /home/$USERNAME/.docker \
+    && chown -R $USERNAME:$USERNAME /home/$USERNAME/.gitconfig.d \
+    && chown -R $USERNAME:$USERNAME /home/$USERNAME/.ssh
+
 WORKDIR /workspace
-RUN chown ${USERNAME}:${USERNAME} /workspace
-
-# Ensure the node user has sudo access
-RUN echo "node ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/node \
-    && chmod 0440 /etc/sudoers.d/node
 
 # Switch to non-root user
-USER node
+USER $USERNAME
 
 # Set environment variables
-ENV DEVCONTAINER=true \
-    NODE_ENV=development
+ENV DOCKER_BUILDKIT=1
+ENV COMPOSE_DOCKER_CLI_BUILD=1
