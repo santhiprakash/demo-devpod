@@ -4,8 +4,8 @@
 if [ ! -f ~/.gitconfig ]; then
     touch ~/.gitconfig
     git config --global init.defaultBranch main
-    git config --global user.name "DevPod User"
-    git config --global user.email "devpod@example.com"
+    git config --global user.name "Prakash"
+    git config --global user.email "b.santhiprakash@gmail.com"
 fi
 
 # Ensure proper SSH directory permissions
